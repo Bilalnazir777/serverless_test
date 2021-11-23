@@ -8,25 +8,21 @@ import { updateenrollment } from "../../common/dynamodb"
 const updateoneenrollment: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (event) => {
 
   const data = event.body
-  const id = event.pathParameters
+  const { id } = event.pathParameters
 
   const newdata = {
     TableName: "SEMSTABLE",
     Key: {
-      id
+      id,
     },
     UpdateExpression:
-      'set courseid = :courseid,  studentid = :studentid, dateofassigment = :dateofassigment',
-
-    ConditionExpression: "attrribute_exist(id)",
+      'SET courseid = :courseid,  studentid = :studentid, dateofassigment = :dateofassigment',
     ExpressionAttributeValues: {
-      ':courseid': data.coursecode,
+      ':courseid': data.courseid,
       ':studentid': data.studentid,
       ':dateofassigment': data.dateofassigment,
-
-
     },
-    ReturnValues: 'UPDATED_NEW',
+    ReturnValues: 'ALL_NEW',
   }
   const ReturnedUpdatedData = await updateenrollment(newdata)
   return formatJSONResponse({

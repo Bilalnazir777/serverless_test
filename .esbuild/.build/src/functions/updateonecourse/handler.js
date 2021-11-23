@@ -1251,23 +1251,20 @@ var updatecourse = async (newdata) => {
 // src/functions/updateonecourse/handler.ts
 var updateonecourse = async (event) => {
   const data = event.body;
-  const id = event.pathParameters;
+  const { id } = event.pathParameters;
   const newdata = {
     TableName: "SEMSTABLE",
     Key: {
       id
     },
     UpdateExpression: "set coursecode = :coursecode,  coursetitle = :coursetitle, CR = :CR",
-    ExpressionAttributeNames: {
-      "#coursetitle": "coursetitle"
-    },
-    ConditionExpression: "attrribute_exist(id)",
+    ConditionExpression: "attribute_exists(id)",
     ExpressionAttributeValues: {
       ":coursecode": data.coursecode,
       ":coursetitle": data.coursetitle,
       ":CR": data.CR
     },
-    ReturnValues: "UPDATED_NEW"
+    ReturnValues: "ALL_NEW"
   };
   const ReturnedUpdatedData = await updatecourse(newdata);
   return formatJSONResponse({

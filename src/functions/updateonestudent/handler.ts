@@ -28,7 +28,7 @@ const updateStudent: ValidatedEventAPIGatewayProxyEvent<typeof schema> = async (
     },
     ReturnValues: 'ALL_NEW',
   }
-  console.log(newdata, "hfjkhskdfhhgfhsdgfjgj");
+  // console.log(newdata, "hfjkhskdfhhgfhsdgfjgj");
 
   const ReturnedUpdatedData = await updateOneStudent(newdata)
   return formatJSONResponse({

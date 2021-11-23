@@ -200,7 +200,6 @@ export const createenrollment = async (data) => {
         return data.Item
     }
     catch (error) {
-        console.log(error)
         return "any of the body attributes is not upto mark"
     }
 }

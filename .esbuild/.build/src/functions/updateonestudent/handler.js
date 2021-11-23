@@ -1269,7 +1269,6 @@ var updateStudent = async (event) => {
     },
     ReturnValues: "ALL_NEW"
   };
-  console.log(newdata, "hfjkhskdfhhgfhsdgfjgj");
   const ReturnedUpdatedData = await updateOneStudent(newdata);
   return formatJSONResponse({
     body: ReturnedUpdatedData,
