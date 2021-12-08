@@ -1244,8 +1244,7 @@ var getcourse = async (data) => {
     const singlecourse = await dynamodb.get(data).promise();
     return singlecourse;
   } catch (error) {
-    console.log(error);
-    return "course not found";
+    return error;
   }
 };
 

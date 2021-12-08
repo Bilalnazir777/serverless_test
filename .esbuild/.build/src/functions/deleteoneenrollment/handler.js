@@ -1250,16 +1250,17 @@ var deleteenrollment = async (data) => {
 
 // src/functions/deleteoneenrollment/handler.ts
 var deleteoneenrollment = async (event) => {
-  const id = event.pathParameters;
+  const { id } = event.pathParameters;
   const data = {
     TableName: "SEMSTABLE",
     Key: {
       id
-    }
+    },
+    ConditionExpression: "attribute_exists(id)"
   };
-  await deleteenrollment(data);
+  const response = await deleteenrollment(data);
   return formatJSONResponse({
-    Message: "enrollment deleted"
+    body: response
   });
 };
 var main = middyfy(deleteoneenrollment);

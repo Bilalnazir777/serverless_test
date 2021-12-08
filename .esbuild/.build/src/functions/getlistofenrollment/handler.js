@@ -1239,28 +1239,69 @@ var dynamodb = new AWS.DynamoDB.DocumentClient({
   region: "localhost",
   endpoint: "http://localhost:8000"
 });
-var getenrollmentlist = async (data) => {
+var getenrollmentlist = async () => {
   let enrollmentlist;
-  const List = await dynamodb.scan(data).promise();
-  enrollmentlist = List.Items;
-  console.log("data ===>", enrollmentlist);
-  return enrollmentlist;
-};
-
-// src/functions/getlistofenrollment/handler.ts
-var enrollmentList = async (event) => {
-  const data = {
+  const List = await dynamodb.scan({
     TableName: "SEMSTABLE",
-    ProjectionExpression: "coursetitle,studentid,dateofassigment",
+    ProjectionExpression: "courseid,studentid,dateofassigment",
     FilterExpression: "begins_with(id,:v)",
     ExpressionAttributeValues: {
       ":v": "en"
     }
-  };
-  const courses = await getenrollmentlist(data);
+  }).promise();
+  enrollmentlist = List.Items;
+  return enrollmentlist;
+};
+var getOneStudent = async (data) => {
+  try {
+    const singlestudent = await dynamodb.get(data).promise();
+    return singlestudent;
+  } catch (error) {
+    return error;
+  }
+};
+var getcourse = async (data) => {
+  try {
+    const singlecourse = await dynamodb.get(data).promise();
+    return singlecourse;
+  } catch (error) {
+    return error;
+  }
+};
+
+// src/functions/getlistofenrollment/handler.ts
+var enrollmentList = async (event) => {
+  const enrollements = await getenrollmentlist();
+  const response = [];
+  for (const index in enrollements) {
+    const courseid = enrollements[index].courseid;
+    const studentid = enrollements[index].studentid;
+    const dateofenrollment = enrollements[index].dateofassigment;
+    const data = {
+      TableName: "SEMSTABLE",
+      Key: {
+        id: studentid
+      }
+    };
+    const student = await getOneStudent(data);
+    const studentname = student.Item.name;
+    const coursedata = {
+      TableName: "SEMSTABLE",
+      Key: {
+        id: courseid
+      }
+    };
+    const course = await getcourse(coursedata);
+    const coursetitle = course.Item.coursetitle;
+    response.push({
+      studentname,
+      coursetitle,
+      dateofenrollment
+    });
+  }
   return formatJSONResponse({
     message: "List of enrollment",
-    body: courses
+    body: response
   });
 };
 var main = middyfy(enrollmentList);

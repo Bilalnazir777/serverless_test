@@ -1730,12 +1730,38 @@ var dynamodb = new AWS.DynamoDB.DocumentClient({
   region: "localhost",
   endpoint: "http://localhost:8000"
 });
+var getenrollmentlist = async () => {
+  let enrollmentlist;
+  const List = await dynamodb.scan({
+    TableName: "SEMSTABLE",
+    ProjectionExpression: "courseid,studentid,dateofassigment",
+    FilterExpression: "begins_with(id,:v)",
+    ExpressionAttributeValues: {
+      ":v": "en"
+    }
+  }).promise();
+  enrollmentlist = List.Items;
+  return enrollmentlist;
+};
 var createenrollment = async (data) => {
-  try {
-    await dynamodb.put(data).promise();
-    return data.Item;
-  } catch (error) {
-    return "any of the body attributes is not upto mark";
+  const studentid = data.Item.studentid;
+  const dbdata = await getenrollmentlist();
+  let exist = false;
+  for (let i = 0; i < dbdata.length; i++) {
+    if (studentid === dbdata[i].studentid) {
+      exist = true;
+      break;
+    }
+  }
+  if (exist) {
+    return "enrollment already exist/change studentid";
+  } else {
+    try {
+      await dynamodb.put(data).promise();
+      return data.Item;
+    } catch (error) {
+      return "any of the body attributes is not upto mark";
+    }
   }
 };
 
@@ -1766,8 +1792,7 @@ var createnewenrollment = async (event) => {
   };
   const response = await createenrollment(data);
   return formatJSONResponse({
-    body: response,
-    message: "new enrollemnt added"
+    body: response
   });
 };
 var main = middyfy(createnewenrollment);

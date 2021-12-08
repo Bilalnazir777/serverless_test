@@ -1239,24 +1239,23 @@ var dynamodb = new AWS.DynamoDB.DocumentClient({
   region: "localhost",
   endpoint: "http://localhost:8000"
 });
-var getcourselist = async (data) => {
+var getcourselist = async () => {
   let courselist;
-  const List = await dynamodb.scan(data).promise();
+  const List = await dynamodb.scan({
+    TableName: "SEMSTABLE",
+    ProjectionExpression: "coursetitle,coursecode,CH",
+    FilterExpression: "begins_with(id,:v)",
+    ExpressionAttributeValues: {
+      ":v": "cr"
+    }
+  }).promise();
   courselist = List.Items;
   return courselist;
 };
 
 // src/functions/getlistofcourses/handler.ts
 var coursesList = async (event) => {
-  const data = {
-    TableName: "SEMSTABLE",
-    ProjectionExpression: "coursetitle,coursecode,CR",
-    FilterExpression: "begins_with(id,:v)",
-    ExpressionAttributeValues: {
-      ":v": "cr"
-    }
-  };
-  const courses = await getcourselist(data);
+  const courses = await getcourselist();
   return formatJSONResponse({
     message: "List of courses",
     body: courses

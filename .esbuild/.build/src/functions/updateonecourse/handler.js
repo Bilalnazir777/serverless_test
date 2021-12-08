@@ -1257,19 +1257,18 @@ var updateonecourse = async (event) => {
     Key: {
       id
     },
-    UpdateExpression: "set coursecode = :coursecode,  coursetitle = :coursetitle, CR = :CR",
+    UpdateExpression: "set coursecode = :coursecode,  coursetitle = :coursetitle, CH = :CH",
     ConditionExpression: "attribute_exists(id)",
     ExpressionAttributeValues: {
       ":coursecode": data.coursecode,
       ":coursetitle": data.coursetitle,
-      ":CR": data.CR
+      ":CH": data.CH
     },
     ReturnValues: "ALL_NEW"
   };
   const ReturnedUpdatedData = await updatecourse(newdata);
   return formatJSONResponse({
-    body: ReturnedUpdatedData,
-    message: "course updated"
+    body: ReturnedUpdatedData
   });
 };
 var main = middyfy(updateonecourse);

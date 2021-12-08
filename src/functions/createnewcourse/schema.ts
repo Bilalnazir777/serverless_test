@@ -3,9 +3,7 @@ export default {
   properties: {
     coursecode: { type: "string" },
     coursetitle: { type: "string" },
-    CR: { type: "number" }
-
-
+    CH: { type: "number" },
   },
-  required: ['coursecode', 'coursetitle', 'CR',]
+  required: ["coursecode", "coursetitle", "CH"],
 } as const;

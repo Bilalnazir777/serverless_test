@@ -1250,16 +1250,17 @@ var deleteOneStudent = async (data) => {
 
 // src/functions/deleteonestudent/handler.ts
 var deleteStudent = async (event) => {
-  const id = event.pathParameters;
+  const { id } = event.pathParameters;
   const data = {
     TableName: "SEMSTABLE",
     Key: {
       id
-    }
+    },
+    ConditionExpression: "attribute_exists(id)"
   };
-  await deleteOneStudent(data);
+  const response = await deleteOneStudent(data);
   return formatJSONResponse({
-    Message: "student deleted"
+    body: response
   });
 };
 var main = middyfy(deleteStudent);

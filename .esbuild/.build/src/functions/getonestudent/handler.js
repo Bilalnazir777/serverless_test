@@ -1244,7 +1244,7 @@ var getOneStudent = async (data) => {
     const singlestudent = await dynamodb.get(data).promise();
     return singlestudent;
   } catch (error) {
-    return "wrong id";
+    return error;
   }
 };
 

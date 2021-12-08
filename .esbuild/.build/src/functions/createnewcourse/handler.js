@@ -1730,13 +1730,39 @@ var dynamodb = new AWS.DynamoDB.DocumentClient({
   region: "localhost",
   endpoint: "http://localhost:8000"
 });
+var getcourselist = async () => {
+  let courselist;
+  const List = await dynamodb.scan({
+    TableName: "SEMSTABLE",
+    ProjectionExpression: "coursetitle,coursecode,CH",
+    FilterExpression: "begins_with(id,:v)",
+    ExpressionAttributeValues: {
+      ":v": "cr"
+    }
+  }).promise();
+  courselist = List.Items;
+  return courselist;
+};
 var createcourse = async (data) => {
-  try {
-    await dynamodb.put(data).promise();
-    return data.Item;
-  } catch (error) {
-    console.log(error);
-    return "any of attribute missing";
+  const coursetitle = data.Item.coursetitle;
+  const dbdata = await getcourselist();
+  let exist = false;
+  for (let i = 0; i < dbdata.length; i++) {
+    if (coursetitle === dbdata[i].coursetitle) {
+      exist = true;
+      break;
+    }
+  }
+  if (exist) {
+    return "course already exist/change course title";
+  } else {
+    try {
+      await dynamodb.put(data).promise();
+      return data.Item;
+    } catch (error) {
+      console.log(error);
+      return "any of attribute missing";
+    }
   }
 };
 
@@ -1761,14 +1787,13 @@ var createnewcourse = async (event) => {
     Item: {
       coursecode: body.coursecode,
       coursetitle: body.coursetitle,
-      CR: body.CR,
+      CH: body.CH,
       id: courseid
     }
   };
   const response = await createcourse(data);
   return formatJSONResponse({
-    body: response,
-    message: "new course created"
+    body: response
   });
 };
 var main = middyfy(createnewcourse);

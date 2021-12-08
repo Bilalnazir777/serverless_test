@@ -1244,22 +1244,23 @@ var deletecourse = async (data) => {
     await dynamodb.delete(data).promise();
     return "course deleted";
   } catch (error) {
-    return "course not found";
+    return error;
   }
 };
 
 // src/functions/deleteonecourse/handler.ts
 var deleteonecourse = async (event) => {
-  const id = event.pathParameters;
+  const { id } = event.pathParameters;
   const data = {
     TableName: "SEMSTABLE",
     Key: {
       id
-    }
+    },
+    ConditionExpression: "attribute_exists(id)"
   };
-  await deletecourse(data);
+  const response = await deletecourse(data);
   return formatJSONResponse({
-    Message: "student deleted"
+    body: response
   });
 };
 var main = middyfy(deleteonecourse);
